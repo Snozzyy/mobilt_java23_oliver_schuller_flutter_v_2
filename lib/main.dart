@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Wow this is cool'),
+      home: const MyHomePage(title: 'Epic title'),
     );
   }
 }
@@ -36,6 +36,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  var remember = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,31 +50,40 @@ class _MyHomePageState extends State<MyHomePage> {
           width: 225,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+
             children: <Widget>[
-               const TextField(
+
+              const TextField(
                 decoration: InputDecoration(
                     hintText: "Username"
                 ),
               ),
+
               const TextField(
                 obscureText: true,
                 decoration: InputDecoration(
                   hintText: "Password"
                 ),
               ),
-              const CheckboxListTile(
-                title: Text("Remember me"),
-                value: true,
-                onChanged: null
+
+              CheckboxListTile(
+                title: const Text("Remember me"),
+                value: remember,
+                onChanged: (bool? newValue) {
+                  setState(() {
+                    remember = newValue!;
+                  });
+                }
               ),
+
               ElevatedButton(
                   onPressed: () {
-                    log("Button pressed");
                     Navigator.push(context, MaterialPageRoute(builder:
                         (context) => const LoggedIn()));
                   },
                   child: const Text("Log in")
               ),
+
             ],
           ),
         )
