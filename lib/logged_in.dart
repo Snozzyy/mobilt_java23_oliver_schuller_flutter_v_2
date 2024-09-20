@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:mobilt_java23_oliver_schuller_flutter_v_2/main.dart';
 
@@ -10,7 +8,6 @@ void main() {
 class LoggedIn extends StatelessWidget {
   const LoggedIn({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,6 +18,9 @@ class LoggedIn extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const LoggedInPage(title: 'Epic title'),
+      routes: {
+        "/login": (context) => const MyApp(),
+      },
     );
   }
 }
@@ -75,20 +75,12 @@ class _LoggedInPageState extends State<LoggedInPage> {
               case 0:
                 break;
               case 1:
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MyApp()));
+                Navigator.pushNamed(
+                    context, "/login");
                 break;
             }
           }
         ),
     );
-  }
-
-   onItemTapped(int index){
-    setState(() {
-      _selectedIndex = index;
-      log(_selectedIndex.toString());
-    });
   }
 }

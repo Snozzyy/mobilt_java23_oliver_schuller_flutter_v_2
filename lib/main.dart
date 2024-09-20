@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'logged_in.dart';
 
 void main() {
@@ -21,6 +22,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Epic title'),
+      routes: {
+        "/home": (context) => const LoggedIn()
+      },
     );
   }
 }
@@ -36,10 +40,35 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  var remember = false;
+  String username = "";
+  String password = "";
+  bool rememberMe = false;
+
+  late TextEditingController usernameController;
+  late TextEditingController passwordController;
+
+  @override
+  void initState() {
+    loadData();
+    usernameController = TextEditingController(text: username);
+    passwordController = TextEditingController(text: password);
+    super.initState();
+  }
+
+  void loadData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      username = prefs.getString("username") ?? "";
+      password = prefs.getString("password") ?? "";
+      rememberMe = prefs.getBool("rememberMe") ?? false;
+    });
+
+  }
 
   @override
   Widget build(BuildContext context) {
+    loadData();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -52,42 +81,82 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
 
             children: <Widget>[
-
-              const TextField(
-                decoration: InputDecoration(
+              TextFormField(
+                controller: usernameController,
+                decoration: const InputDecoration(
                     hintText: "Username"
                 ),
               ),
 
-              const TextField(
+              TextFormField(
+                controller: passwordController,
                 obscureText: true,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: "Password"
                 ),
               ),
 
               CheckboxListTile(
                 title: const Text("Remember me"),
-                value: remember,
+                value: rememberMe,
                 onChanged: (bool? newValue) {
                   setState(() {
-                    remember = newValue!;
+                    rememberMe = newValue!;
+                    updateRememberMe();
                   });
                 }
               ),
 
               ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder:
-                        (context) => const LoggedIn()));
+                    if (rememberMe = true) {
+                      username = usernameController.text;
+                      password = passwordController.text;
+
+                      updateUsername();
+                      updatePassword();
+
+                    } else {
+                      clearPreferences();
+                    }
+
+                    Navigator.pushNamed(context, "/home");
                   },
                   child: const Text("Log in")
               ),
-
             ],
           ),
         )
       ),
     );
+  }
+
+  void updateRememberMe() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+    prefs.setBool("rememberMe", rememberMe);
+    });
+
+  }
+
+  void updateUsername() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      prefs.setString("username", username);
+    });
+  }
+
+  void updatePassword() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      prefs.setString("password", password);
+    });
+  }
+
+  void clearPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
   }
 }
